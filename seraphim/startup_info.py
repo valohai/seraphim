@@ -1,31 +1,21 @@
 import bs4
-import requests
 
+from seraphim.context import Context
 from seraphim.utils import emchunken, get_text
 
 
-def _query_startup_info(startup_ids, cookies):
+def _query_startup_info(context: Context, startup_ids):
     params = list({
         'promotion_event_id': '',
         'tab': 'find',
         'page': 1,
     }.items()) + [('startup_ids[]', startup_id) for startup_id in startup_ids]
-    resp = requests.get(
+    resp = context.session.get(
         url='https://angel.co/job_listings/browse_startups_table',
         params=params,
-        headers={
-            'User-Agent': 'Oispa kaljaa',
-        },
-        cookies=cookies,
     )
     resp.raise_for_status()
     return resp
-
-
-def get_startup_info(startup_ids, cookies):
-    for startup_ids in emchunken(startup_ids, 10):
-        resp = _query_startup_info(startup_ids, cookies)
-        yield from parse_startups_table(resp.content)
 
 
 def parse_startups_table(content):
@@ -48,3 +38,9 @@ def parse_startups_table(content):
                 'compensation': get_text(listing, 'div.collapsed-compensation'),
             })
         yield info
+
+
+def get_startup_info(context, startup_ids):
+    for startup_ids in emchunken(startup_ids, 10):
+        resp = _query_startup_info(context, startup_ids)
+        yield from parse_startups_table(resp.content)
