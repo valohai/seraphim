@@ -25,7 +25,7 @@ def parse_startups_table(content):
             'id': startup['data-id'],
             'name': startup['data-name'],
             'listings': [],
-            'www': startup.find('a', class_='website-link').get('href'),
+            'www': get_text(startup, 'a.website-link', attr='href'),
             'employees': get_text(startup, 'div.employees'),
             'locations': get_text(startup, 'div.locations'),
             'tagline': get_text(startup, 'div.tagline'),

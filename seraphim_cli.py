@@ -21,7 +21,14 @@ def cli(session):
 @cli.command(name='download', help='Download startup info as JSON')
 @click.option('-d', '--directory', required=True)
 @click.argument('startup_ids', nargs=-1)
-def download_startups(directory, startup_ids):
+@click.option('--id-file', '-f', type=click.File(), help='ID JSON list file')
+def download_startups(directory, startup_ids, id_file):
+    startup_ids = list(startup_ids)
+    if id_file:
+        startup_ids.extend(json.load(id_file))
+    if not startup_ids:
+        raise click.UsageError('Need startup IDs (either from file or command line)')
+    startup_ids = [int(startup_id) for startup_id in startup_ids]
     if not os.path.isdir(directory):
         os.makedirs(directory)
 

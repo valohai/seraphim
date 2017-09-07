@@ -9,7 +9,8 @@ def emchunken(input, length):
         yield chunk
 
 
-def get_text(soup, selector):
+def get_text(soup, selector, attr=None):
     for tag in soup.select(selector):
-        return (tag.text or '').replace('·', ' ').strip()
+        text = (tag[attr] if attr else (tag.text or ''))
+        return text.replace('·', ' ').strip()
     return None
